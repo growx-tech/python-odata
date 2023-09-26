@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Connecting to an endpoint
 =========================
@@ -55,42 +53,55 @@ API
 
 import logging
 import urllib.parse
-from typing import Optional, TypeVar
+from typing import TypeVar
 
-from .entity import EntityBase, declarative_base
-from .metadata import MetaData
-from .exceptions import ODataError
-from .context import Context
-from .action import Action, Function
+from odata.action import Action, Function
+from odata.context import Context
+from odata.entity import declarative_base
+from odata.exceptions import ODataError
+from odata.metadata import MetaData
 
 __all__ = (
-    'ODataService',
-    'ODataError',
+    "ODataService",
+    "ODataError",
 )
 
 from .query import Query
-
 from .reflector import MetadataReflector
 
-Q = TypeVar('Q')
+Q = TypeVar("Q")
 
 
-class ODataService(object):
+class ODataService:
     """
     :param url: Endpoint address. Must be an address that can be appended with ``$metadata``
     :param base: Custom base class to use for entities
+    :param metadata_url: Some (= Microsoft) use a metadata url that does not follow the standards, but is somewhere else
     :param reflect_entities: Create a request to the service for its metadata, and create entity classes automatically
-    :param reflect_output_path: Optional parameter, if reflect_entities is configured it will create all reflected classes at this path
+    :param reflect_output_path: Optional parameter, if reflect_entities is configured it will create all reflected
+     classes at this path
     :param session: Custom Requests session to use for communication with the endpoint
     :param auth: Custom Requests auth object to use for credentials
-    :param quiet_progress: Don't show any progress information while reflecting metadata and while other long duration tasks are running. Default is to show progress
+    :param quiet_progress: Don't show any progress information while reflecting metadata and while other long duration
+     tasks are running. Default is to show progress
     :raises ODataConnectionError: Fetching metadata failed. Server returned an HTTP error code
     """
-    def __init__(self, url, base=None, reflect_entities=False, reflect_output_package: Optional[str] = None, session=None, auth=None, quiet_progress=False):
+
+    def __init__(
+        self,
+        url,
+        metadata_url: str | None = None,
+        base=None,
+        reflect_entities=False,
+        reflect_output_package: str | None = None,
+        session=None,
+        auth=None,
+        quiet_progress=False,
+    ):
         self.url = url
-        self.metadata_url = urllib.parse.urljoin(url + "/", "$metadata")
+        self.metadata_url = urllib.parse.urljoin(metadata_url if metadata_url else url + "/", "$metadata")
         self.collections = {}
-        self.log = logging.getLogger('odata.service')
+        self.log = logging.getLogger("odata.service")
         self.default_context = Context(auth=auth, session=session)
         self.quiet_progress = quiet_progress
 
@@ -136,14 +147,14 @@ class ODataService(object):
         self.metadata = MetaData(self, quiet=self.quiet_progress)
         self.Entity = self.Base  # alias
 
-        self.Action = type('Action', (Action,), dict(__odata_service__=self))
+        self.Action = type("Action", (Action,), dict(__odata_service__=self))
         """
         A baseclass for this service's Actions
 
         :type Action: Action
         """
 
-        self.Function = type('Function', (Function,), dict(__odata_service__=self))
+        self.Function = type("Function", (Function,), dict(__odata_service__=self))
         """
         A baseclass for this service's Functions
 
@@ -159,10 +170,16 @@ class ODataService(object):
         self.Entity.__odata_service__ = self
 
     def __repr__(self):
-        return u'<ODataService at {0}>'.format(self.url)
+        return f"<ODataService at {self.url}>"
 
     def _write_reflected_types(self, metadata_url: str, package: str):
-        outputter = MetadataReflector(metadata_url=metadata_url, entities=self.entities, types=self.types, package=package, quiet=self.quiet_progress)
+        outputter = MetadataReflector(
+            metadata_url=metadata_url,
+            entities=self.entities,
+            types=self.types,
+            package=package,
+            quiet=self.quiet_progress,
+        )
         outputter.write_reflected_types()
 
     def create_context(self, auth=None, session=None):
