@@ -26,7 +26,7 @@ phases:
     commands:
       - poetry env info
       - poetry run flake8
-      # - poetry run pytest --cov-report term --cov-report xml:coverage.xml --cov=src -v tests/
+       - poetry run pytest --cov-report term --cov-report xml:coverage.xml --cov=src -v odata/tests/
   post_build:
     on-failure: ABORT
     commands:
