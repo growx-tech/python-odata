@@ -1,0 +1,38 @@
+version: 0.2
+cache:
+  paths:
+    - '/root/.venv/**/*'
+    - '/root/.pyenv/versions/**'
+env:
+  variables:
+    PYENV_VERSION: "3.11.5"
+phases:
+  install:
+    on-failure: ABORT
+    commands:
+      - cd /root/.pyenv/plugins/python-build/../.. && git pull -q && cd -
+      - pyenv install $PYENV_VERSION --skip-existing
+      - curl -sSL https://install.python-poetry.org | python -
+      - export PATH="$HOME/.local/bin:$PATH"
+      - export CODE_ARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain growx --query authorizationToken --output text)
+      - poetry config http-basic.growx-data aws $CODE_ARTIFACT_TOKEN --local
+  pre_build:
+    on-failure: ABORT
+    commands:
+      - poetry --version
+      - poetry install
+  build:
+    on-failure: ABORT
+    commands:
+      - poetry env info
+      - poetry run flake8
+      # - poetry run pytest --cov-report term --cov-report xml:coverage.xml --cov=src -v tests/
+  post_build:
+    on-failure: ABORT
+    commands:
+      - echo Build completed on `date`
+reports:
+  pytest_reports:
+    files:
+      - coverage.xml
+    file-format: COBERTURAXML
