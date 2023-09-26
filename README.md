@@ -1,4 +1,10 @@
+# python-odata for Business Central
+**REMARK** This fork does not promise anything beyond that it will work with the Business Central API
+
+It does enforce all other Growy coding standards (configured in pre-commit) - so, code might look a bit different.
+
 # python-odata
+
 
 A simple library for read/write access to OData services.
 
@@ -52,7 +58,7 @@ query = Service.query(Order)
 query = query.filter(Order.ShipCity == 'Berlin')
 
 for order in query:
-    order.ShippedDate = datetime.datetime.utcnow() 
+    order.ShippedDate = datetime.datetime.utcnow()
     order.Employee = empl
     Service.save(order)
 ```
