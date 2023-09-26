@@ -2,18 +2,18 @@
 name = "python-odata"
 version = "0.5.4"
 description = "A simple library for read/write access to OData services."
-license="MIT"
+license = "MIT"
 authors = ["Tuomas Mursu <tuomas.mursu@kapsi.fi>", "Cristian Libotean <eblis102@gmail.com>"]
 readme = "README.md"
 packages = [
-	{ include = "odata/*.py" },
+    { include = "odata/*.py" },
 ]
 include = [
-  { path = "odata/reflect-templates", format = ["sdist", "wheel"] }
+    { path = "odata/reflect-templates", format = ["sdist", "wheel"] }
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = ">=3.11,<3.12"
 requests = ">=2.28.2"
 python-dateutil = ">=2.8.2"
 rich = ">=13.3.1"
@@ -23,6 +23,7 @@ mako = ">=1.2.4"
 [tool.poetry.group.dev.dependencies]
 responses = ">=0.22.0"
 pytz = "^2022.7.1"
+pre-commit = ">=3.4.0"
 
 [tool.poetry.group.docs]
 optional = true
