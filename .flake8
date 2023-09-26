@@ -1,0 +1,18 @@
+[flake8]
+ignore = W503, RST304, RST303, E203
+max-line-length = 120
+max-complexity = 10
+exclude =
+  # Exclude generated code.
+  **/proto/**
+  **/gapic/**
+  *_pb2.py
+  *migrations*
+  # Exclude venv
+  .venv/**
+  data/**
+  # Standard linting exemptions.
+  __pycache__,
+  .git,
+  *.pyc,
+  conf.py
